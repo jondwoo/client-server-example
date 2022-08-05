@@ -16,8 +16,7 @@ import { useState } from "react";
 
 const App = () => {
   const [input, setInput] = useState("");
-  const [todoToEdit, setTodoToEdit] = useState("");
-  const [editMode, setEditMode] = useState(false);
+  const [todoToEdit, setTodoToEdit] = useState();
   const [todoList, setTodoList] = useState(["hw", "shopping", "chores"]);
 
   const handleDelete = todo => {
@@ -31,20 +30,27 @@ const App = () => {
   };
 
   const handleEdit = todo => {
-    setEditMode(true);
     setTodoToEdit(todo);
-    console.log(todo);
   };
 
   const handleSave = todo => {
-    setEditMode(false);
-    setTodoToEdit("");
-    console.log(todo);
+    if (input.length) {
+      const index = todoList.indexOf(todo);
+      if (index !== -1) {
+        todoList.splice(index, 1);
+      }
+      todoList.splice(index, 0, input);
+      const newList = [...todoList];
+
+      setTodoList(newList);
+
+      setTodoToEdit();
+    }
+    setTodoToEdit();
   };
 
   const handleAdd = () => {
     setTodoList(prev => [...prev, input]);
-    console.log(input);
   };
 
   const handleChange = e => {
@@ -79,14 +85,14 @@ const App = () => {
                   </IconButton>
                   <IconButton
                     edge="end"
-                    aria-label={editMode === false ? "edit" : "save"}
+                    aria-label={todoToEdit !== todo ? "edit" : "save"}
                     onClick={
-                      editMode === false
+                      todoToEdit !== todo
                         ? () => handleEdit(todo)
                         : () => handleSave(todo)
                     }
                   >
-                    {editMode === false ? <Edit /> : <Save />}
+                    {todoToEdit !== todo ? <Edit /> : <Save />}
                   </IconButton>
                 </>
               }
@@ -94,7 +100,12 @@ const App = () => {
               {todoToEdit !== todo ? (
                 <ListItemText primary={todo} />
               ) : (
-                <TextField size="small" name={todo} defaultValue={todo} />
+                <TextField
+                  onChange={e => handleChange(e)}
+                  size="small"
+                  name={todo}
+                  defaultValue={todo}
+                />
               )}
             </ListItem>
           );
