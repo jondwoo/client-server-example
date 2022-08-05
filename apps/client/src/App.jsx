@@ -14,6 +14,8 @@ import {
 import { Delete, Edit, Save } from "@mui/icons-material";
 import { useState } from "react";
 
+import axios from "axios";
+
 const App = () => {
   const [input, setInput] = useState("");
   const [todoToEdit, setTodoToEdit] = useState();
@@ -33,7 +35,7 @@ const App = () => {
     setTodoToEdit(todo);
   };
 
-  const handleSave = todo => {
+  const handleSave = async todo => {
     if (input.length) {
       const index = todoList.indexOf(todo);
       if (index !== -1) {
@@ -49,8 +51,13 @@ const App = () => {
     setTodoToEdit();
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     setTodoList(prev => [...prev, input]);
+
+    const res = await axios.post("/", {
+      name: input,
+    });
+    console.log(res.data);
   };
 
   const handleChange = e => {
