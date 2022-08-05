@@ -1,33 +1,113 @@
-import { useState } from "react";
-import "./App.css";
+import {
+  Button,
+  Container,
+  ListItemText,
+  IconButton,
+  List,
+  ListItem,
+  TextField,
+  Typography,
+  Divider,
+  Stack,
+} from "@mui/material";
 
-function App() {
-  const [count, setCount] = useState(0);
+import { Delete, Edit, Save } from "@mui/icons-material";
+import { useState } from "react";
+
+const App = () => {
+  const [input, setInput] = useState("");
+  const [todoToEdit, setTodoToEdit] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const [todoList, setTodoList] = useState(["hw", "shopping", "chores"]);
+
+  const handleDelete = todo => {
+    setTodoList(prev => {
+      const index = prev.indexOf(todo);
+      if (index !== -1) {
+        prev.splice(index, 1);
+        return [...prev];
+      }
+    });
+  };
+
+  const handleEdit = todo => {
+    setEditMode(true);
+    setTodoToEdit(todo);
+    console.log(todo);
+  };
+
+  const handleSave = todo => {
+    setEditMode(false);
+    setTodoToEdit("");
+    console.log(todo);
+  };
+
+  const handleAdd = () => {
+    setTodoList(prev => [...prev, input]);
+    console.log(input);
+  };
+
+  const handleChange = e => {
+    setInput(e.target.value);
+  };
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount(count => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <Container
+      maxWidth="lg"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Typography>TODO List</Typography>
+      <Divider flexItem />
+      <List>
+        {todoList.map(todo => {
+          return (
+            <ListItem
+              key={todo}
+              sx={{ width: "20rem" }}
+              secondaryAction={
+                <>
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => handleDelete(todo)}
+                  >
+                    <Delete />
+                  </IconButton>
+                  <IconButton
+                    edge="end"
+                    aria-label={editMode === false ? "edit" : "save"}
+                    onClick={
+                      editMode === false
+                        ? () => handleEdit(todo)
+                        : () => handleSave(todo)
+                    }
+                  >
+                    {editMode === false ? <Edit /> : <Save />}
+                  </IconButton>
+                </>
+              }
+            >
+              {todoToEdit !== todo ? (
+                <ListItemText primary={todo} />
+              ) : (
+                <TextField size="small" name={todo} defaultValue={todo} />
+              )}
+            </ListItem>
+          );
+        })}
+      </List>
+      <TextField size="small" onChange={e => handleChange(e)} />
+      <Stack direction="row">
+        <Button sx={{ mt: 1 }} onClick={handleAdd}>
+          Submit
+        </Button>
+      </Stack>
+    </Container>
   );
-}
+};
 
 export default App;
