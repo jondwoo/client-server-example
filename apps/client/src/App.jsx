@@ -1,38 +1,29 @@
 import {
   Button,
   Container,
-  ListItemText,
-  IconButton,
-  List,
-  ListItem,
   TextField,
   Typography,
   Divider,
   Stack,
 } from "@mui/material";
 
-import { Delete, Edit, Save } from "@mui/icons-material";
+import TodoList from "./components/TodoList/TodoList";
+import { createTodo, baseUrl } from "./api";
+import { mutate } from "swr";
 import { useState } from "react";
-
-import axios from "axios";
 
 const App = () => {
   const [input, setInput] = useState("");
   const [todoToEdit, setTodoToEdit] = useState();
-  const [todoList, setTodoList] = useState(["hw", "shopping", "chores"]);
+  const [todoList, setTodoList] = useState([]);
 
   const handleDelete = todo => {
-    setTodoList(prev => {
-      const index = prev.indexOf(todo);
-      if (index !== -1) {
-        prev.splice(index, 1);
-        return [...prev];
-      }
-    });
+    // impl
   };
 
   const handleEdit = todo => {
     setTodoToEdit(todo);
+    // impl
   };
 
   const handleSave = async todo => {
@@ -52,12 +43,11 @@ const App = () => {
   };
 
   const handleAdd = async () => {
-    setTodoList(prev => [...prev, input]);
-
-    const res = await axios.post("/", {
+    await createTodo({
       name: input,
     });
-    console.log(res.data);
+
+    mutate(`${baseUrl}/todos`);
   };
 
   const handleChange = e => {
@@ -75,49 +65,13 @@ const App = () => {
     >
       <Typography>TODO List</Typography>
       <Divider flexItem />
-      <List>
-        {todoList.map(todo => {
-          return (
-            <ListItem
-              key={todo}
-              sx={{ width: "20rem" }}
-              secondaryAction={
-                <>
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    onClick={() => handleDelete(todo)}
-                  >
-                    <Delete />
-                  </IconButton>
-                  <IconButton
-                    edge="end"
-                    aria-label={todoToEdit !== todo ? "edit" : "save"}
-                    onClick={
-                      todoToEdit !== todo
-                        ? () => handleEdit(todo)
-                        : () => handleSave(todo)
-                    }
-                  >
-                    {todoToEdit !== todo ? <Edit /> : <Save />}
-                  </IconButton>
-                </>
-              }
-            >
-              {todoToEdit !== todo ? (
-                <ListItemText primary={todo} />
-              ) : (
-                <TextField
-                  onChange={e => handleChange(e)}
-                  size="small"
-                  name={todo}
-                  defaultValue={todo}
-                />
-              )}
-            </ListItem>
-          );
-        })}
-      </List>
+      <TodoList
+        todoToEdit={todoToEdit}
+        handleChange={handleChange}
+        handleEdit={handleEdit}
+        handleSave={handleSave}
+        handleDelete={handleDelete}
+      />
       <TextField size="small" onChange={e => handleChange(e)} />
       <Stack direction="row">
         <Button sx={{ mt: 1 }} onClick={handleAdd}>

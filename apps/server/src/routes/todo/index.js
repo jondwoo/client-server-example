@@ -1,17 +1,21 @@
 import express from "express";
-import Todo from "../../schemas/todo";
+import { Todo } from "../../schemas/todo.js";
 
 const router = express.Router();
 
 router
-  .route("/")
-  .get((req, res) => {})
+  .route("/todos")
+  .get(async (req, res) => {
+    const todos = await Todo.find({}, { _id: false }).select("-__v");
+
+    return res.status(200).send(todos);
+  })
   .post(async (req, res) => {
-    console.log(req.body);
-    // const { todo } = req.body;
-    // await Todo.create(todo).exec();
-    //
-    // return res.sendStatus(200);
+    const todo = req.body;
+
+    await Todo.create(todo);
+
+    return res.sendStatus(200);
   });
 
 export default router;
