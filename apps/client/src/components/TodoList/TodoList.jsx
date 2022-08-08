@@ -14,15 +14,14 @@ import axios from "axios";
 import useSWR from "swr";
 
 const TodoList = ({
+  error,
+  data,
   todoToEdit,
   handleDelete,
   handleEdit,
   handleSave,
   handleChange,
 }) => {
-  const fetcher = url => axios.get(url).then(res => res.data);
-  const { data, error } = useSWR(`${baseUrl}/todos`, fetcher);
-
   if (error) {
     return <Typography>Loading...</Typography>;
   }

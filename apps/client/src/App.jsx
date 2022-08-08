@@ -7,14 +7,18 @@ import {
   Stack,
 } from "@mui/material";
 
+import axios from "axios";
 import TodoList from "./components/TodoList/TodoList";
-import { createTodo, baseUrl } from "./api";
-import { mutate } from "swr";
+import { updateTodo, baseUrl } from "./api";
+import useSWR, { mutate } from "swr";
 import { useState } from "react";
 
 const App = () => {
   const [input, setInput] = useState("");
   const [todoToEdit, setTodoToEdit] = useState();
+
+  const fetcher = url => axios.get(url).then(res => res.data);
+  const { data: TodoObjArray, error } = useSWR(`${baseUrl}/todos`, fetcher);
 
   const handleDelete = todo => {
     // impl
@@ -22,19 +26,23 @@ const App = () => {
 
   const handleEdit = todo => {
     setTodoToEdit(todo);
-    // impl
   };
 
-  const handleSave = async todo => {
+  const handleSave = async currentTodo => {
+    const filteredArray = TodoObjArray.filter(obj => {
+      return obj.name === currentTodo;
+    });
+
+    await updateTodo(input, filteredArray[0]._id);
+
     setTodoToEdit();
+
+    mutate(`${baseUrl}/todos`);
   };
 
   const handleAdd = async () => {
-    await createTodo({
-      name: input,
-    });
     setInput("");
-    mutate(`${baseUrl}/todos`);
+    // impl
   };
 
   const handleChange = e => {
@@ -53,6 +61,8 @@ const App = () => {
       <Typography>TODO List</Typography>
       <Divider flexItem />
       <TodoList
+        error={error}
+        data={TodoObjArray}
         todoToEdit={todoToEdit}
         handleChange={handleChange}
         handleEdit={handleEdit}
