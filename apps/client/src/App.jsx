@@ -15,7 +15,6 @@ import { useState } from "react";
 const App = () => {
   const [input, setInput] = useState("");
   const [todoToEdit, setTodoToEdit] = useState();
-  const [todoList, setTodoList] = useState([]);
 
   const handleDelete = todo => {
     // impl
@@ -27,18 +26,6 @@ const App = () => {
   };
 
   const handleSave = async todo => {
-    if (input.length) {
-      const index = todoList.indexOf(todo);
-      if (index !== -1) {
-        todoList.splice(index, 1);
-      }
-      todoList.splice(index, 0, input);
-      const newList = [...todoList];
-
-      setTodoList(newList);
-
-      setTodoToEdit();
-    }
     setTodoToEdit();
   };
 
@@ -46,7 +33,7 @@ const App = () => {
     await createTodo({
       name: input,
     });
-
+    setInput("");
     mutate(`${baseUrl}/todos`);
   };
 
@@ -72,7 +59,7 @@ const App = () => {
         handleSave={handleSave}
         handleDelete={handleDelete}
       />
-      <TextField size="small" onChange={e => handleChange(e)} />
+      <TextField size="small" value={input} onChange={e => handleChange(e)} />
       <Stack direction="row">
         <Button sx={{ mt: 1 }} onClick={handleAdd}>
           Submit
