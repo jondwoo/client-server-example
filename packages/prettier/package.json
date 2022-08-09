@@ -1,0 +1,10 @@
+{
+  "name": "prettier-config",
+  "version": "0.0.0",
+  "description": "custom prettier config",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
